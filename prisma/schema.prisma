@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ProfileIcon {
+  id     Int    @id @default(autoincrement())
+  name   String
+  url    String
+  user   User?   @relation(fields: [userId], references: [id])
+  userId Int?    @unique
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  particularAddress String
+  city String
+  province String
+  country String
+  user User @relation(fields: [userId], references: [id])
+  userId Int @unique
+  purchaseOrders PurchaseOrder[]
+  receips        Receipt[]
+}
+
+model PurchaseOrder {
+  id Int @id @default(autoincrement())
+  orderDate String
+  orderHour String
+  total Float
+  subtotal Float
+  iva Int
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  address Address @relation(fields: [addressId], references: [id])
+  addressId Int
+}
+
+enum UserType {
+  CLIENT
+  ADMIN
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  name            String
+  lastname        String
+  email           String   @unique
+  password        String
+  dni             String
+  birthday        String
+  type            UserType @default(CLIENT)
+  profileIcon     ProfileIcon?
+  address         Address?
+  purchaseOrders  PurchaseOrder[]
+  cartItems       CartItem[]
+  receipts        Receipt[]
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  name      String
+  product   Product? @relation(fields: [productId], references: [id])
+  productId Int?     @unique
+}
+
+model Product {
+  id           Int            @id @default(autoincrement())
+  name         String
+  description  String
+  price        Int
+  quantity     Int            @default(1)
+  stock        Int
+  image        Image?
+  categories   Category[]
+  cartItems    CartItem[]
+  receiptitems ReceiptItem[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model CartItem {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  @@unique([userId, productId])
+}
+
+model Receipt {
+  id        Int          @id @default(autoincrement())
+  date      DateTime     @default(now())
+  subtotal  Float
+  total     Float
+  iva       Float
+
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id])
+
+  addressId Int
+  address   Address      @relation(fields: [addressId], references: [id])
+
+  items     ReceiptItem[]
+}
+
+model ReceiptItem {
+  id        Int      @id @default(autoincrement())
+  receiptId Int
+  receipt   Receipt  @relation(fields: [receiptId], references: [id])
+
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+
+  quantity  Int
+  price     Float
+}

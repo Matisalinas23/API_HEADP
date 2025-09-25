@@ -1,0 +1,38 @@
+{
+  "name": "headp_apirest",
+  "version": "0.0.1",
+  "description": "apirest para el proyecto de practicas de tup tienda headp",
+  "license": "ISC",
+  "author": "Matias Salinas",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "tsnd --respawn --clear src/server.ts",
+    "start": "tsc --respawn --clear src/server.ts"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.1.0",
+    "concurrently": "^9.2.1",
+    "prisma": "^6.13.0",
+    "rimraf": "^6.0.1",
+    "ts-node-dev": "^2.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "ngrok": "^5.0.0-beta.2",
+    "tailwind-scrollbar": "^4.0.2",
+    "typescript": "^5.9.2"
+  }
+}

@@ -7,7 +7,10 @@
   "main": "src/app.js",
   "scripts": {
     "dev": "tsnd --respawn --clear src/server.ts",
-    "start": "tsc --respawn --clear src/server.ts"
+    "start": "tsc --respawn --clear src/server.ts",
+    "build": "tsc",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

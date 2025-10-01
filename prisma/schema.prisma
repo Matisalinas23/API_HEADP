@@ -86,6 +86,7 @@ model Product {
   categories   Category[]
   cartItems    CartItem[]
   receiptitems ReceiptItem[]
+  sales        Sale[]
 }
 
 model Category {
@@ -129,4 +130,11 @@ model ReceiptItem {
 
   quantity  Int
   price     Float
+}
+
+model Sale {
+  id          Int     @id @default(autoincrement())
+  date        DateTime @default(now())
+  productId   Int
+  product     Product @relation(fields: [productId], references: [id])
 }

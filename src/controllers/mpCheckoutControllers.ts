@@ -1,5 +1,8 @@
 import axios from 'axios'
 import { Request, Response } from 'express'
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient()
 
 interface AxiosErrorLike {
   response?: {
@@ -9,7 +12,7 @@ interface AxiosErrorLike {
 }
 
 export const createPreferenceId = async (req: Request, res: Response): Promise<void> => {
-    const { title, unit_price, quantity } = req.body
+    const { title, unit_price, quantity, productId } = req.body
     const MP_API_URL = 'https://api.mercadopago.com/checkout/preferences'
     const ACCESS_TOKEN = process.env.MY_ACCESS_TOKEN
     const APP_BASE_URL = process.env.APP_BASE_URL
@@ -17,7 +20,13 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
 
     const preferenceData: any = {
         items: [
-            { title, unit_price, quantity }
+            {
+                id: productId,
+                title,
+                unit_price,
+                quantity,
+
+            }
         ],
     }
 
@@ -27,7 +36,8 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
             success: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
             failure: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
             pending: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
-        }
+        },
+        preferenceData.notification_url = 'https://api-headp.onrender.com/webhook'
     }
 
     if (!ACCESS_TOKEN) {
@@ -58,5 +68,34 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
         const err = error as AxiosErrorLike
         console.log(err.response?.data || err.message);
         res.status(500).json({ error: "Error creating preference" });
+    }
+}
+
+export const webhook = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const paymentId = req.query.id || req.body.data.id
+
+        if (paymentId) {
+            const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`,{
+                headers: { Authorization: `Bearer ${process.env.MY_ACCESS_TOKEN}` }
+            }).then(r => r.json())
+
+            const productId = response.external_reference
+
+            if (response.status === "approved") {
+                await prisma.sale.create({
+                    data: {
+                        productId,
+                        date: new Date()
+                    }
+                })
+                console.log("Venta registrada:", response);
+            }
+        }
+
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(500);
     }
 }

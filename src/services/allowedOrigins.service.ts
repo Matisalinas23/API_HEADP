@@ -1,7 +1,7 @@
 const allowedOrigins: (string | RegExp)[] = [
   'http://localhost:3001',
   'https://api-headp.onrender.com',
-  /https:\/\/.*\.ngrok-free\.app$/
+  'https://front-headp.vercel.app/',
 ]
 
 export const corsOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {

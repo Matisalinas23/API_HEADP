@@ -21,6 +21,8 @@ export const createProduct = async(req: Request, res: Response): Promise<void> =
 
     const file = req.file; // multer saves the image
 
+    console.log('body: ', req.body)
+
     try {
         if (!name || !description || !price || !stock || !categories || !file) {
             res.status(400).json({ error: "Name, description, categories, price and stock are required" });

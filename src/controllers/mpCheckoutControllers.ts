@@ -24,9 +24,9 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
     if (!isDev) {
         preferenceData.auto_return = 'approved';
         preferenceData.back_urls = {
-            success: `${APP_BASE_URL}/product_page`,
-            failure: `${APP_BASE_URL}/product_page`,
-            pending: `${APP_BASE_URL}/product_page`,
+            success: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
+            failure: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
+            pending: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
         }
     }
 

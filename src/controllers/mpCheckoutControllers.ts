@@ -38,7 +38,7 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
             failure: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
             pending: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
         },
-        preferenceData.notification_url = 'https://api-headp.onrender.com/webhook'
+        preferenceData.notification_url = 'https://api-headp.onrender.com/mpCheckouts/webhook'
     }
 
     console.log('preference data: ', preferenceData)

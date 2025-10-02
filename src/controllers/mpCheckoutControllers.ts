@@ -75,8 +75,6 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
 }
 
 export const webhook = async (req: Request, res: Response): Promise<void> => {
-    console.log("WEBHOOK CALLED", req.method, req.body, req.query);
-
     try {
         const paymentId = req.query.id || req.query['data.id'] || req.body.data?.id;
 
@@ -92,11 +90,11 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
             if (response.status === "approved") {
                 await prisma.sale.create({
                     data: {
-                        productId,
+                        productId: Number(productId),
                         date: new Date()
                     }
                 })
-                console.log("Venta registrada:", response);
+                console.log("Venta registrada");
             }
         }
 

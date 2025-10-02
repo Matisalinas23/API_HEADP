@@ -19,15 +19,14 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
     const isDev = process.env.NODE_ENV !== 'production'
 
     const preferenceData: any = {
-        items: [
-            {
-                id: productId,
-                title,
-                unit_price,
-                quantity,
+        items: [{
+            id: productId,
+            title,
+            unit_price,
+            quantity,
 
-            }
-        ],
+        }],
+        external_reference: productId,
     }
 
     if (!isDev) {
@@ -72,10 +71,10 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
 }
 
 export const webhook = async (req: Request, res: Response): Promise<void> => {
-    console.log('webhook endpoint was called')
+    console.log("WEBHOOK CALLED", req.method, req.body, req.query);
 
     try {
-        const paymentId = req.query.id || req.body.data.id
+        const paymentId = req.query.id || req.query['data.id'] || req.body.data?.id;
 
         if (paymentId) {
             const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`,{
@@ -83,6 +82,8 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
             }).then(r => r.json())
 
             const productId = response.external_reference
+
+            console.log('webhook response: ', response)
 
             if (response.status === "approved") {
                 await prisma.sale.create({

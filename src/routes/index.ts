@@ -8,3 +8,4 @@ export { default as productRoutes } from "./productRoutes";
 export { default as imageRoutes } from "./imageRoutes";
 export { default as cartItemRoutes } from "./cartItemRoutes";
 export { default as mpCheckoutRoutes } from "./mpCheckoutRoutes";
+export { default as salesRoutes } from "./saleRoutes"

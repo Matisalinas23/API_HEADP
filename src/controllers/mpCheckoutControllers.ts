@@ -72,6 +72,8 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
 }
 
 export const webhook = async (req: Request, res: Response): Promise<void> => {
+    console.log('webhook endpoint was called')
+
     try {
         const paymentId = req.query.id || req.body.data.id
 

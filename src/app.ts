@@ -2,8 +2,9 @@ import dotenv from 'dotenv'
 import express from 'express'
 import {
   authRoutes, addressRoutes, userRoutes, profileIconRoutes, categoryRoutes,
-  productRoutes, imageRoutes, cartItemRoutes, mpCheckoutRoutes,
-} from "./routes";import cors from "cors"
+  productRoutes, imageRoutes, cartItemRoutes, mpCheckoutRoutes, salesRoutes
+} from "./routes";
+import cors from "cors"
 import { corsOrigin } from './services/allowedOrigins.service'
 
 dotenv.config()
@@ -28,6 +29,7 @@ app.use('/products', productRoutes)
 app.use('/images', imageRoutes)
 app.use('/cartItems', cartItemRoutes)
 app.use('/mpCheckouts', mpCheckoutRoutes)
+app.use('/sales', salesRoutes)
 
 
 export default app

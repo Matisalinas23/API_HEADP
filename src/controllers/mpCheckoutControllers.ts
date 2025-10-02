@@ -29,6 +29,8 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
         external_reference: productId,
     }
 
+    console.log('isdev: ', isDev)
+
     if (!isDev) {
         preferenceData.auto_return = 'approved';
         preferenceData.back_urls = {
@@ -38,6 +40,8 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
         },
         preferenceData.notification_url = 'https://api-headp.onrender.com/webhook'
     }
+
+    console.log('preference data: ', preferenceData)
 
     if (!ACCESS_TOKEN) {
         res.status(401).json({ error: 'Access token is invalid: ', ACCESS_TOKEN })

@@ -35,7 +35,7 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
             unit_price,
             quantity,
         }],
-        external_reference: { productId: productId, stock: stock },
+        external_reference: productId,
     }
 
     if (!isDev) {
@@ -85,7 +85,7 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
                 headers: { Authorization: `Bearer ${process.env.MY_ACCESS_TOKEN}` }
             }).then(r => r.json())
 
-            const { productId, stock } = response.external_reference
+            const productId = response.external_reference
 
             if (response.status === "approved") {
                 const existingSale = await prisma.sale.findUnique({
@@ -107,7 +107,7 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
                     const updatingStock = await prisma.product.update({
                         where: { id: Number(productId) },
                         data: {
-                            stock: stock - 1
+                            stock: { decrement: 1 }
                         }
                     })
                 }

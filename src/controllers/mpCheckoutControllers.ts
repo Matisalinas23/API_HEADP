@@ -19,9 +19,9 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
     }
 
     const MP_API_URL = 'https://api.mercadopago.com/checkout/preferences'
-    const ACCESS_TOKEN = process.env.MY_ACCESS_TOKEN
-    const APP_BASE_URL = process.env.APP_BASE_URL
     const isDev = process.env.NODE_ENV !== 'production'
+    const ACCESS_TOKEN = isDev ? process.env.MY_ACCESS_TOKEN : process.env.MY_ACCESS_TOKEN_TEST
+    const APP_BASE_URL = process.env.APP_BASE_URL
 
     const preferenceData: any = {
         items: [{

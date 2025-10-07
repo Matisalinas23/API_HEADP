@@ -1,8 +1,9 @@
 import express from 'express'
-import { getAllSales } from '../controllers/saleControllers'
+import { clearSales, getAllSales } from '../controllers/saleControllers'
 
 const router = express.Router()
 
 router.get('/', getAllSales)
+router.delete('/', clearSales)
 
 export default router;

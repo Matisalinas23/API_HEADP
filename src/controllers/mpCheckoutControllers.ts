@@ -12,7 +12,12 @@ interface AxiosErrorLike {
 }
 
 export const createPreferenceId = async (req: Request, res: Response): Promise<void> => {
-    const { title, unit_price, quantity, productId } = req.body
+    const { title, unit_price, quantity, productId, stock } = req.body
+
+    if (stock === 0 ) {
+        res.sendStatus(400)
+    }
+
     const MP_API_URL = 'https://api.mercadopago.com/checkout/preferences'
     const ACCESS_TOKEN = process.env.MY_ACCESS_TOKEN
     const APP_BASE_URL = process.env.APP_BASE_URL
@@ -24,12 +29,9 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
             title,
             unit_price,
             quantity,
-
         }],
-        external_reference: productId,
+        external_reference: { productId: productId, stock: stock },
     }
-
-    console.log('isdev: ', isDev)
 
     if (!isDev) {
         preferenceData.auto_return = 'approved';
@@ -38,26 +40,21 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
             failure: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
             pending: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
         },
-        preferenceData.notification_url = 'https://api-headp.onrender.com/mpCheckouts/webhook'
+        preferenceData.notification_url = 'http://localhost:3000/mpCheckouts/webhook' // 'https://api-headp.onrender.com/mpCheckouts/webhook'
     }
-
-    console.log('preference data: ', preferenceData)
 
     if (!ACCESS_TOKEN) {
         res.status(401).json({ error: 'Access token is invalid: ', ACCESS_TOKEN })
         return;
     }
 
-    if (!title) {
-        res.status(400).json({ error: 'title is not valid: ', title })
-        return;
-    } else if (!unit_price) {
-        res.status(400).json({ error: 'unit_price is not valid: ', unit_price })
-        return;
-    } else if (!quantity) {
-        res.status(400).json({ error: 'quantity is not valid: ', quantity })
+    console.log("Stock: ", stock)
+
+    if (!title || !unit_price || !quantity || !productId || !stock) {
+        res.status(400).json({ error: 'title, unit_price, quantity, productId or srock is not valid.' })
         return;
     }
+    
 
     try {
         const response = await axios.post(MP_API_URL, preferenceData, 
@@ -79,26 +76,41 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
         const paymentId = req.query.id || req.query['data.id'] || req.body.data?.id;
 
         if (paymentId) {
-            const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`,{
+            const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
                 headers: { Authorization: `Bearer ${process.env.MY_ACCESS_TOKEN}` }
             }).then(r => r.json())
 
-            const productId = response.external_reference
-
-            console.log('webhook response: ', response)
+            const { productId, stock } = response.external_reference
 
             if (response.status === "approved") {
-                await prisma.sale.create({
-                    data: {
-                        productId: Number(productId),
-                        date: new Date()
-                    }
-                })
-                console.log("Venta registrada");
-            }
-        }
+                const existingSale = await prisma.sale.findUnique({
+                    where: { paymentId: String(paymentId) },
+                });
 
-        res.sendStatus(200);
+                if (!existingSale) {
+                    const sale = await prisma.sale.create({
+                        data: {
+                            productId: Number(productId),
+                            paymentId: String(paymentId),
+                            status: response.status,
+                            date: new Date(),
+                        },
+                    });
+
+                    console.log("Venta creada: ", sale)
+
+                    const updatingStock = await prisma.product.update({
+                        where: { id: Number(productId) },
+                        data: {
+                            stock: stock - 1
+                        }
+                    })
+                }
+            }
+
+            res.sendStatus(200);
+        }
+        
     } catch (error) {
         console.error(error)
         res.sendStatus(500);

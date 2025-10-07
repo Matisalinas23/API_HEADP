@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Request, Response } from 'express'
 import { PrismaClient } from "@prisma/client";
+import { access } from 'fs';
 
 const prisma = new PrismaClient()
 
@@ -14,14 +15,18 @@ interface AxiosErrorLike {
 export const createPreferenceId = async (req: Request, res: Response): Promise<void> => {
     const { title, unit_price, quantity, productId, stock } = req.body
 
+    console.log("DENTRO")
+
     if (stock === 0 ) {
         res.sendStatus(400)
     }
 
     const MP_API_URL = 'https://api.mercadopago.com/checkout/preferences'
     const isDev = process.env.NODE_ENV !== 'production'
-    const ACCESS_TOKEN = isDev ? process.env.MY_ACCESS_TOKEN : process.env.MY_ACCESS_TOKEN_TEST
+    const ACCESS_TOKEN = process.env.MY_ACCESS_TOKEN_TEST
     const APP_BASE_URL = process.env.APP_BASE_URL
+
+    console.log("ACCESS TOKEN: ", ACCESS_TOKEN)
 
     const preferenceData: any = {
         items: [{

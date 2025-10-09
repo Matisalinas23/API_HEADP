@@ -5,6 +5,6 @@ import { webhook } from '../controllers/mpCheckoutControllers';
 const router = express.Router()
 
 router.post('/createPreferenceId', createPreferenceId)
-router.post('/webhook', webhook)
+router.post('/webhook/:stock', webhook)
 
 export default router;

@@ -109,6 +109,13 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
                 });
 
                 console.log("Venta creada: ", sale)
+
+                const updatedStock = await prisma.product.update({
+                    where: { id: paymentId },
+                    data: { stock: Number(req.params.stock) - 1 }
+                })
+
+                console.log("UpdatedStock: ", updatedStock)
             }
         }
 

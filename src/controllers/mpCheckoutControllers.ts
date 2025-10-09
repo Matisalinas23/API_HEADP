@@ -71,6 +71,8 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
 }
 
 export const webhook = async (req: Request, res: Response): Promise<void> => {
+    console.log("In Webhook")
+
     try {
         const paymentId = req.query.id || req.query['data.id'] || req.body.data?.id;
 
@@ -84,6 +86,7 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
         }).then(r => r.json())
 
         const productId = response.external_reference
+        console.log("prodId: ", productId)
 
         if (isNaN(productId)) {
             console.error("ProductId is invalid:", response.external_reference);

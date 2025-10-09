@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { Request, Response } from 'express'
 import { PrismaClient } from "@prisma/client";
-import { access } from 'fs';
 
 const prisma = new PrismaClient()
 
@@ -15,7 +14,10 @@ interface AxiosErrorLike {
 export const createPreferenceId = async (req: Request, res: Response): Promise<void> => {
     const { title, unit_price, quantity, productId, stock } = req.body
 
-    console.log("DENTRO")
+    if (!title || !unit_price || !quantity || !productId || !stock) {
+        res.status(400).json({ error: 'title, unit_price, quantity, productId or srock is not valid.' })
+        return;
+    }
 
     if (stock === 0 ) {
         res.sendStatus(400)
@@ -27,6 +29,11 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
     const APP_BASE_URL = process.env.APP_BASE_URL
 
     console.log("ACCESS TOKEN: ", ACCESS_TOKEN)
+
+    if (!ACCESS_TOKEN) {
+        res.status(401).json({ error: 'Access token is invalid: ', ACCESS_TOKEN })
+        return;
+    }
 
     const preferenceData: any = {
         items: [{
@@ -45,21 +52,8 @@ export const createPreferenceId = async (req: Request, res: Response): Promise<v
             failure: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
             pending: `${APP_BASE_URL}/product_page` || 'https://front-headp.vercel.app',
         },
-        preferenceData.notification_url = 'https://api-headp-1.onrender.com/mpCheckouts/webhook'
+        preferenceData.notification_url = `https://api-headp-1.onrender.com/mpCheckouts/webhook/${stock}`
     }
-
-    if (!ACCESS_TOKEN) {
-        res.status(401).json({ error: 'Access token is invalid: ', ACCESS_TOKEN })
-        return;
-    }
-
-    console.log("Stock: ", stock)
-
-    if (!title || !unit_price || !quantity || !productId || !stock) {
-        res.status(400).json({ error: 'title, unit_price, quantity, productId or srock is not valid.' })
-        return;
-    }
-    
 
     try {
         const response = await axios.post(MP_API_URL, preferenceData, 
@@ -80,42 +74,42 @@ export const webhook = async (req: Request, res: Response): Promise<void> => {
     try {
         const paymentId = req.query.id || req.query['data.id'] || req.body.data?.id;
 
-        if (paymentId) {
-            const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-                headers: { Authorization: `Bearer ${process.env.MY_ACCESS_TOKEN}` }
-            }).then(r => r.json())
+        if (!paymentId) {
+            console.log("Webhook hasn't paymentId")
+            res.sendStatus(400);
+        }
 
-            const productId = response.external_reference
+        const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+            headers: { Authorization: `Bearer ${process.env.MY_ACCESS_TOKEN}` }
+        }).then(r => r.json())
 
-            if (response.status === "approved") {
-                const existingSale = await prisma.sale.findUnique({
-                    where: { paymentId: String(paymentId) },
+        const productId = response.external_reference
+
+        if (isNaN(productId)) {
+            console.error("ProductId is invalid:", response.external_reference);
+            res.sendStatus(400);
+        }
+
+        if (response.status === "approved") {
+            const existingSale = await prisma.sale.findUnique({
+                where: { paymentId: String(paymentId) },
+            });
+
+            if (!existingSale) {
+                const sale = await prisma.sale.create({
+                    data: {
+                        productId: productId,
+                        paymentId: String(paymentId),
+                        status: response.status,
+                        date: new Date(),
+                    },
                 });
 
-                if (!existingSale) {
-                    const sale = await prisma.sale.create({
-                        data: {
-                            productId: Number(productId),
-                            paymentId: String(paymentId),
-                            status: response.status,
-                            date: new Date(),
-                        },
-                    });
-
-                    console.log("Venta creada: ", sale)
-
-                    const updatingStock = await prisma.product.update({
-                        where: { id: Number(productId) },
-                        data: {
-                            stock: { decrement: 1 }
-                        }
-                    })
-                }
+                console.log("Venta creada: ", sale)
             }
-
-            res.sendStatus(200);
         }
-        
+
+        res.sendStatus(200);
     } catch (error) {
         console.error(error)
         res.sendStatus(500);

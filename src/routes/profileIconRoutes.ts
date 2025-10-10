@@ -1,12 +1,13 @@
 import express from "express"
 import multer from "multer"
 import { createProfileIcon, deleteProfileIcon, getAllProfileIcons } from "../controllers/profileIconControllers"
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = express.Router()
 const upload = multer({ dest: "uploads/" }); // Carpeta temporal
 
-router.post("/", upload.single("image"), createProfileIcon);
-router.get("/", getAllProfileIcons)
-router.delete("/:id", deleteProfileIcon)
+router.post("/", authMiddleware, upload.single("image"), createProfileIcon);
+router.get("/", authMiddleware, getAllProfileIcons)
+router.delete("/:id", authMiddleware, deleteProfileIcon)
 
 export default router;

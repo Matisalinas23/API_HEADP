@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { PrismaClient } from "@prisma/client";
+import { IUser } from "../models/user.interface";
 
 const prisma = new PrismaClient()
 
@@ -174,5 +175,33 @@ export const addProfileIcon = async (req: Request, res: Response) => {
         } 
         console.log("Error in 'addProfileIcon' ", error)
         res.status(500).json({ error: "Internal server error" })
+    }
+}
+
+export const getUserByEmail = async (req: Request, res: Response) => {
+    const { email } = req.params
+
+    try {
+        if (!email) {
+            res.status(400).json({ error: "Email was not sent" })
+        }
+
+        const user: IUser | null = await prisma.user.findUnique({
+            where: { email: email },
+            include: {
+                address: true,
+                profileIcon: true,
+                purchaseOrders: true,
+            }
+        })
+
+        if (!user) {
+            res.status(404).json({ error: "User was no found" })
+        }
+
+        res.status(200).json(user)
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Internal server error in 'getUserByEmail'" })
     }
 }

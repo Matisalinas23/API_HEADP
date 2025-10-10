@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { comparePassword, hashPassword } from "../services/password.service";
+import { comparePassword, hashPassword } from "../services/auth/password.service";
 import { PrismaClient } from "@prisma/client";
-import { generateToken } from "../services/authService";
+import { generateToken } from "../services/auth/authService";
 import { validateBirthday } from "../services/validateBirthday";
 
 const prisma = new PrismaClient()
@@ -10,7 +10,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, lastname, email, password, dni, birthday, type, address } = req.body;
 
     try {
-        // Validate required fields
         if (!type) {
             if (!email || !password || !name || !lastname || !dni || !birthday || !address){
                 res.status(400).json({ error: "Email, password, name, lastname, dni and birthday are required" });
@@ -25,7 +24,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
         const validatedBirthday = validateBirthday(birthday)
         if (validatedBirthday === null) {
-            res.status(400).json({ error: "Birthday must be a valid format (dd/mm/yyyy) and you must have 12 years or older" })
+            res.status(400).json({ error: "Birthday must be a valid format (dd/mm/yyyy) and you must have 12 years or oldder" })
         }
 
         const hashedPassword = await hashPassword(password);
@@ -39,7 +38,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         let newUser: any
         let newAddress: any
 
-        // Create new user
+        // Use transactional to create user and address at the same time
         await prisma.$transaction(async (tx) => {
             newUser = await tx.user.create({
                 data: {
@@ -58,7 +57,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             });
 
             if (!type) {
-                // Crear dirección
                 newAddress = await tx.address.create({
                     data: {
                         particularAddress: address.particularAddress,
@@ -71,13 +69,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             }
         });
 
-        // Generate token
-        const token = generateToken(newUser);
-        res.status(201).json({ token });
+        const token: string = generateToken(newUser);
+        const userId: string = newUser.id
+        res.status(201).json({ token, userId });
     } catch (error: any) {
         console.log(error);
 
-        // Handle specific error cases
         if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
             res.status(409).json({ error: "Email already exists" });
         }
@@ -121,7 +118,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         const token = generateToken(userLoged)
-        res.status(201).json({ token });
+        const userId = userLoged.id
+        res.status(201).json({ token, userId });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "there was an error in login" });

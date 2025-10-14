@@ -1,14 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from 'jsonwebtoken';
+import { jwtPayload } from "../models/jwt.interface";
 
-
-interface JwtPayload {
-  userId: number;
-}
 
 const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key";
 
-export const authMiddleware = (req: Request & { userId?: number }, res: Response,next: NextFunction ): void => {
+export const authMiddleware = (req: Request & { userId?: number }, res: Response, next: NextFunction ): void => {
     const authHeader = req.headers.authorization
 
     if (!authHeader) {
@@ -19,7 +16,7 @@ export const authMiddleware = (req: Request & { userId?: number }, res: Response
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, JWT_SECRET) as jwtPayload;
     req.userId = decoded.userId;
     next()
   } catch (error) {

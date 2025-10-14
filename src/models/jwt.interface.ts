@@ -1,5 +1,4 @@
 export interface jwtPayload {
-    id: number;
-    email: string;
-    password: string;
+    userId: number;
+    type: "ADMIN" | "CLIENT"
 }

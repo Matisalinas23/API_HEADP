@@ -6,6 +6,8 @@ import {
 } from "./routes";
 import cors from "cors"
 import { corsOrigin } from './services/allowedOrigins.service'
+import cookieParser from 'cookie-parser';
+import prisma from './prisma';
 
 dotenv.config()
 
@@ -18,6 +20,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
+
+app.use(cookieParser());
 
 // Routes
 app.use('/auth', authRoutes)

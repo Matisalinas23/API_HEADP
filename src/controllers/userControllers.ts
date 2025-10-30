@@ -1,8 +1,7 @@
 import { Request, Response } from "express"
 import { PrismaClient } from "@prisma/client";
 import { IUser } from "../models/user.interface";
-
-const prisma = new PrismaClient()
+import prisma from "../prisma";
 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -67,9 +66,48 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const { name, lastname, email, purchaseOrders, type } = req.body;
-    console.log("Query body: ", req.body)
 
     try {
+        if (!id || isNaN(Number(id))) {
+            res.status(400).json({ message: "Invalid user ID" });
+            return;
+        }
+
+        const updatedUser = await prisma.user.update({
+        where: { id: Number(id) },
+        data: {
+            name,
+            lastname,
+            email,
+            purchaseOrders,
+            type,
+        },
+        include: {
+            profileIcon: true,
+            address: true,
+            purchaseOrders: true
+        }
+        });
+
+        res.status(200).json(updatedUser);
+    } catch (error: any) {
+        console.log(error);
+
+        if (error.code === 'P2025') {
+            res.status(404).json({ message: "User not found" });
+        }
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const updateuserAddress = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    const { particularAddress, city, province, country } = req.body;
+
+    try {
+        if (!particularAddress || !city || !province || !country) {
+            res.status(400).json({ error: "Any address atribute is not defined or is not valid" })
+        }
         // Validate id from req.params
         if (!id || isNaN(Number(id))) {
             res.status(400).json({ message: "Invalid user ID" });
@@ -80,11 +118,14 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         const updatedUser = await prisma.user.update({
         where: { id: Number(id) },
         data: {
-            name,
-            lastname,
-            email,
-            purchaseOrders,
-            type,
+            address: {
+                update: {
+                    particularAddress: particularAddress,
+                    city: city,
+                    province: province,
+                    country: country
+                }
+            }
         },
         include: {
             profileIcon: true,

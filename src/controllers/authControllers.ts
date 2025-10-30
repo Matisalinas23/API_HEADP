@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { comparePassword, hashPassword } from "../services/auth/password.service";
 import { PrismaClient } from "@prisma/client";
-import { generateToken } from "../services/auth/authService";
+import { generateRefreshToken, generateToken } from "../services/auth/authService";
 import { validateBirthday } from "../services/validateBirthday";
+import jwt from 'jsonwebtoken'
 
 const prisma = new PrismaClient()
+const refreshTokens: string[] = [];
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, lastname, email, password, dni, birthday, type, address } = req.body;
@@ -87,13 +89,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     try {
-        // Validate required fields
         if (!password || !email) {
             res.status(400).json({ error: "email and password are required" })
             return;
         }
 
-        // Find user by email and validate it
         const userLoged = await prisma.user.findUnique({
             where: {
                 email
@@ -103,13 +103,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             }
         })
 
-        // Check if user exists
         if (!userLoged) {
             res.status(404).json({ error: "User not found" });
             return;
         }
         
-        // Compare password from request with password from database
         const passwordMatch = await comparePassword(password, userLoged.password)
 
         if (!passwordMatch) {
@@ -117,11 +115,45 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const token = generateToken(userLoged)
+        const accessToken = generateToken(userLoged)
+        const refreshToken = generateRefreshToken(userLoged)
+
+        refreshTokens.push(refreshToken)
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+
         const userId = userLoged.id
-        res.status(201).json({ token, userId });
+        res.status(201).json({ accessToken, userId });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "there was an error in login" });
     }
+}
+
+export const refresh = (req: Request, res: Response) => {
+    const token = req.cookies.refreshToken
+    const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key"
+    const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "default-refresh-secret-key"
+
+    if (!token || !refreshTokens.includes(token)) {
+        console.log("refreshTokens: ", refreshTokens)
+        console.log("token: ", token)
+        return res.sendStatus(403)
+    }
+
+    jwt.verify(token, JWT_REFRESH_SECRET, (err: any, user: any) => {
+        if (err) {
+            return res.sendStatus(403)
+        }
+
+        const accessToken = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { expiresIn: '15m' })
+
+        console.log({ accessToken })
+
+        return res.json({ accessToken })
+    })
 }

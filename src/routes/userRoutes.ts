@@ -6,11 +6,12 @@ const router = express.Router();
 
 router.put('/update_address/:id', authMiddleware, updateuserAddress)
 router.put("/add_profile_icon/:id", authMiddleware, addProfileIcon);
+router.get('/get_by_email/:email', getUserByEmail);
 
-router.get('/:email', getUserByEmail);
-router.get('/', getAllUsers);
 router.get('/:id', authMiddleware, getUserById);
 router.put('/:id', authMiddleware, updateUser);
 router.delete('/:id', authMiddleware, deleteUser);
+
+router.get('/', getAllUsers);
 
 export default router;

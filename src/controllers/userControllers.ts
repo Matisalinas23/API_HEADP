@@ -5,7 +5,6 @@ import prisma from "../prisma";
 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Fetch all users with related data
         const users = await prisma.user.findMany({
             include: {
                 purchaseOrders: true,
@@ -14,7 +13,6 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
             }
         });
 
-        console.log("Fetched users: ", users);
         res.status(200).json(users);
     } catch (error: any) {
         if (error.code === 'P2025') {
@@ -55,7 +53,6 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        console.log("Fetched user: ", user);
         res.status(200).json(user);
     } catch (error) {
         console.log(error);
@@ -113,7 +110,6 @@ export const updateuserAddress = async (req: Request, res: Response): Promise<vo
             res.status(400).json({ message: "Invalid user ID" });
             return;
         }
-        console.log("Updating user with ID: ", id);
 
         const updatedUser = await prisma.user.update({
         where: { id: Number(id) },
@@ -133,7 +129,6 @@ export const updateuserAddress = async (req: Request, res: Response): Promise<vo
             purchaseOrders: true
         }
         });
-        console.log("Updated user: ", updatedUser);
 
         res.status(200).json(updatedUser);
     } catch (error: any) {
@@ -150,24 +145,19 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const { id } = req.params;
 
     try {
-        // Validate id from req.params
         if (!id || isNaN(Number(id))) {
             res.status(400).json({ message: "Invalid user ID" });
             return;
         }
-        console.log("Deleting user with ID: ", id);
 
-        // Delete user
         const deletedUser = await prisma.user.delete({
             where: { id: Number(id) }
         });
-        console.log("Deleted user: ", deletedUser);
 
         res.status(200).json({ message: "User deleted successfully" });
     } catch (error: any) {
         console.log(error);
 
-        // Handle specific error cases
         if (error.code === 'P2003') {
             res.status(400).json({ message: "Cannot delete user with existing related data" });
             return;
@@ -182,32 +172,30 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
 
 export const addProfileIcon = async (req: Request, res: Response) => {
     const { id } = req.params
-    const { profileIcon } = req.body
+    const { iconId } = req.body
 
     try {
         if (!id || isNaN(Number(id))) {
             res.status(400).json({ error: "Invalid user ID" })
             return;
         }
-        if (!profileIcon.id || isNaN(Number(profileIcon.id))) {
+        if (!iconId || isNaN(Number(iconId))) {
             res.status(400).json({ error: "Invalid profileIcon ID" })
             return;
         }
-        console.log("user id: ", id)
-        console.log("profile icon id: ", profileIcon.id)
 
         const updatedUser = await prisma.user.update({
             where: { id: Number(req.params.id) },
             data: {
                 profileIcon: {
-                    connect: { id: Number(profileIcon.id) }
+                    connect: { id: Number(iconId) }
                 }
             },
             include: {
-                profileIcon: true
+                profileIcon: true,
+                address: true,
             }
         })
-        console.log("Profile icon added in user: ", updatedUser)
 
         res.status(200).json(updatedUser)
     } catch (error: any) {

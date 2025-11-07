@@ -21,8 +21,6 @@ export const createProduct = async(req: Request, res: Response): Promise<void> =
 
     const file = req.file; // multer saves the image
 
-    console.log('body: ', req.body)
-
     try {
         if (!name || !description || !price || !stock || !categories || !file) {
             res.status(400).json({ error: "Name, description, categories, price and stock are required" });
@@ -76,7 +74,6 @@ export const createProduct = async(req: Request, res: Response): Promise<void> =
         });
 
         res.status(201).json(product);
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -125,8 +122,6 @@ export const getProduct = async(req: Request, res: Response): Promise<void> => {
                     categories: true,
                     image: true
                 }
-
-                
             })
 
             if (!product) {
@@ -134,7 +129,6 @@ export const getProduct = async(req: Request, res: Response): Promise<void> => {
                 return;
             }
 
-            console.log("Product: ", product)
             res.status(200).json(product)
         }
 
@@ -152,7 +146,6 @@ export const getProduct = async(req: Request, res: Response): Promise<void> => {
                 return;
             }
 
-            console.log("Product: ", product)
             res.status(200).json(product)
         }  
     } catch (error) {
@@ -172,7 +165,6 @@ export const getProductByCategories = async (req: Request, res: Response): Promi
                 }
             })
 
-            console.log("All products: ", allProducts)
             res.status(200).json(allProducts)
         }
 
@@ -187,9 +179,7 @@ export const getProductByCategories = async (req: Request, res: Response): Promi
             }
         })
 
-        console.log(filteredProducts)
-        res.status(200).json(filteredProducts)
-        
+        res.status(200).json(filteredProducts)        
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: "Internal server error" })
@@ -274,8 +264,6 @@ export const updateProductImage = async(req: Request, res: Response): Promise<vo
             return
         }
 
-        console.log("product: ", product);
-
         let imageData;
 
         if (image) {
@@ -293,8 +281,6 @@ export const updateProductImage = async(req: Request, res: Response): Promise<vo
             const resultUpload: any = await uploadPromise();
             imageData = { url: resultUpload.secure_url, name: product.name };
         }
-
-        console.log("image data: ", imageData);
 
         if (!imageData) {
             res.status(400).json({ error: "There is an error with de image, try again later" })
@@ -314,7 +300,6 @@ export const updateProductImage = async(req: Request, res: Response): Promise<vo
             }
         })
 
-        console.log("Updated product: ", updatedProduct);
         res.status(200).json(updatedProduct);
     } catch (error) {
         console.log(error)
@@ -355,7 +340,6 @@ export const updatedCategoriesProduct = async(req: Request, res: Response): Prom
             }
         })
 
-        console.log('updated product: ', updatedProduct)
         res.status(200).json(updatedProduct)
     } catch (error) {
         console.log(error)
@@ -368,6 +352,7 @@ export const deleteProduct = async(req: Request, res: Response): Promise<void> =
         await prisma.product.delete({ where: { id: Number(req.params.id) } })
         res.status(200).json({ error: "Product deleted successfully" })
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: "Internal server error" })
     }
 }

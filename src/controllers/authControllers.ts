@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { generateRefreshToken, generateToken } from "../services/auth/authService";
 import { validateBirthday } from "../services/validateBirthday";
 import jwt from 'jsonwebtoken'
+import { IUser } from "../models/user.interface";
 
 const prisma = new PrismaClient()
 const refreshTokens: string[] = [];
@@ -35,8 +36,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             res.status(500).json({ error: "Error hashing password" });
             return;
         }
-        console.log("hashed password: " + hashedPassword)
-
+        
         let newUser: any
         let newAddress: any
 
@@ -121,7 +121,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         refreshTokens.push(refreshToken)
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: process.env.NODE_ENV === 'development' ? false : true,
             sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
@@ -134,26 +134,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
+const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key"
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "default-refresh-secret-key"
+
 export const refresh = (req: Request, res: Response) => {
     const token = req.cookies.refreshToken
-    const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key"
-    const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "default-refresh-secret-key"
-
-    if (!token || !refreshTokens.includes(token)) {
-        console.log("refreshTokens: ", refreshTokens)
-        console.log("token: ", token)
-        return res.sendStatus(403)
-    }
 
     jwt.verify(token, JWT_REFRESH_SECRET, (err: any, user: any) => {
         if (err) {
-            return res.sendStatus(403)
+            console.log("Token not refreshed")
+            return res.status(403).json({ message: "Invalid or expired refresh token" })
         }
 
-        const accessToken = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { expiresIn: '15m' })
-
-        console.log({ accessToken })
-
+        const accessToken = generateToken(user as IUser)
+        console.log("Token refreshed")
         return res.json({ accessToken })
     })
 }

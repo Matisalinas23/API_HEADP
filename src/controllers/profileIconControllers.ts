@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { IProfileIcon } from "../models/profileIcon.interface";
 import cloudinary from "../cloudinary";
@@ -87,3 +87,64 @@ export const deleteProfileIcon = async (req: Request, res: Response): Promise<vo
     }
 }
 
+export const getProfileIconById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const profileIcon = await prisma.profileIcon.findUnique({
+      where: { id: Number(req.params.id) }
+    })
+
+    res.status(200).json(profileIcon);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export const getProfileIconByUserId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(req.params.id) },
+      include: { profileIcon: true }
+    })
+
+    if (!user) {
+      res.status(404).json({ message: "User was not found" })
+      return
+    }
+
+    if (!user.profileIcon) {
+      res.status(404).json({ message: "This user has not profile icon" })
+      return
+    }
+
+    const profileIcon = user.profileIcon
+    res.status(200).json(profileIcon)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}
+
+export const updateProfileIcon = async (req: Request, res: Response): Promise<void> => {
+  const { name, url } = req.body
+
+  try {
+    if (!name || !url) {
+      res.status(400).json({ message: "name or url are not sent" })
+      return;
+    }
+
+    const updatedProfileIcon = await prisma.profileIcon.update({
+      where: { id: Number(req.params.id) },
+      data: {
+        name,
+        url
+      }
+    })
+
+    res.status(200).json(updatedProfileIcon)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}

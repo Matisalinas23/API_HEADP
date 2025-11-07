@@ -12,7 +12,6 @@ export const getAllAddress = async (req: Request, res: Response): Promise<void> 
             res.status(404).json({ message: "No addresses found" })
             return;
         }
-        console.log("Fetched address: ", allAddress)
 
         res.status(200).json(allAddress)
     } catch (error: any) {
@@ -23,7 +22,7 @@ export const getAllAddress = async (req: Request, res: Response): Promise<void> 
             res.status(409).json({ error: "Duplicate value error" })
         }
 
-        console.log("Error in 'getAllAddress' ", error)
+        console.log(error)
         res.status(500).json({ error: "Internal server error" })
     }
 }
@@ -42,7 +41,7 @@ export const deleteAddress = async (req: Request, res: Response): Promise<void> 
             res.status(404).json({ error: "Address not found" })
         }
         
-        console.log("Error in 'getAllAddress' ", error)
+        console.log(error)
         res.status(500).json({ error: "Internal server error" })
     }
 }

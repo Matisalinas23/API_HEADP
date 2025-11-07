@@ -9,5 +9,5 @@ export const generateToken = (user: IUser): string => {
 }
 
 export const generateRefreshToken = (user: IUser) => {
-    return jwt.sign({ id: user.id, type: user.type }, JWT_REFRESH_SECRET, { expiresIn: '1h' })
+    return jwt.sign({ id: user.id, type: user.type }, JWT_REFRESH_SECRET, { expiresIn: '1d' })
 }

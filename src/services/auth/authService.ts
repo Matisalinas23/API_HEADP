@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key"
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "default-refresh-secret-key"
 
 export const generateToken = (user: IUser): string => {
-    return jwt.sign({ id: user.id, type: user.type }, JWT_SECRET, { expiresIn: '10m' })
+    return jwt.sign({ id: user.id, type: user.type }, JWT_SECRET, { expiresIn: '3m' })
 }
 
 export const generateRefreshToken = (user: IUser) => {

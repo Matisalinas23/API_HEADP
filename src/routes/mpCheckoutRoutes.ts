@@ -5,7 +5,7 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = express.Router()
 
-router.post('/createPreferenceId',authMiddleware, createPreferenceId)
-router.post('/webhook/:stock', webhook)
+router.post('/createPreferenceId', authMiddleware, createPreferenceId)
+router.post('/webhook/:stock', authMiddleware, webhook)
 
 export default router;

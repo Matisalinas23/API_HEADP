@@ -1,6 +1,6 @@
 const allowedOrigins: (string | RegExp)[] = [
   /^http:\/\/localhost:3001$/,
-  /^https:\/\/api-headp\.onrender\.com$/,
+  /^https:\/\/api-headp-1\.onrender\.com$/,
   /^https:\/\/front-headp\.vercel\.app$/,
 ]
 

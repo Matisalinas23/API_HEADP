@@ -41,7 +41,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         let newAddress: any
 
         // Use transactional to create user and address at the same time
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
             newUser = await tx.user.create({
                 data: {
                     name,
@@ -128,6 +128,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         })
 
         const userId = userLoged.id
+        console.log("In ", process.env.NODE_ENV)
         res.status(201).json({ accessToken, userId });
     } catch (error) {
         console.log(error);

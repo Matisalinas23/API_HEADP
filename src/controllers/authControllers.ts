@@ -118,15 +118,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const accessToken = generateToken(userLoged)
         const refreshToken = generateRefreshToken(userLoged)
         const nodeenv = process.env.NODE_ENV
-        console.log("NODE_ENV: ", nodeenv)
         refreshTokens.push(refreshToken)
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: nodeenv === 'development' ? false : true,
             sameSite: nodeenv === 'development' ? 'lax' : 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: nodeenv === 'production' ? '.vercel.app' : undefined,
+            maxAge: 24 * 60 * 60 * 1000,
+            // domain: nodeenv === 'production' ? '.vercel.app' : undefined,
         })
 
         const userId = userLoged.id

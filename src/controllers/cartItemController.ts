@@ -54,3 +54,20 @@ export const createCartItem = async (req: Request, res: Response): Promise<void>
         res.status(500).json({ error: 'Error al crear cart item' })
     }
 }
+
+export const deleteCartItem = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params
+
+    const cartId = Number(id)
+    
+    try {
+        await prisma.cartItem.delete({
+            where: { id: cartId }
+        })
+
+        res.status(200).json({ message: "El producto ha sido removido del carrito exitosamente" })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "Error intentar remover el producto del carrito" })
+    }
+}

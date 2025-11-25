@@ -125,7 +125,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             secure: nodeenv === 'development' ? false : true,
             sameSite: nodeenv === 'development' ? 'lax' : 'none',
             maxAge: 24 * 60 * 60 * 1000,
-            // domain: nodeenv === 'production' ? '.vercel.app' : undefined,
         })
 
         const userId = userLoged.id

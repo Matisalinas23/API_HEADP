@@ -137,7 +137,8 @@ export const getProduct = async(req: Request, res: Response): Promise<void> => {
                 where: { id: Number(id) },
                 include: {
                     categories: true,
-                    image: true
+                    image: true,
+                    cartItems: true
                 }
             })
 

@@ -1,7 +1,7 @@
 import express from "express"
 import multer from "multer"
-import { createProfileIcon, deleteProfileIcon, getAllProfileIcons, getProfileIconById, getProfileIconByUserId, updateProfileIcon } from "../controllers/profileIconControllers"
-import { authMiddleware } from "../middlewares/authMiddleware";
+import { createProfileIcon, deleteProfileIcon, getAllProfileIcons, getProfileIconById, getProfileIconByUserId, updateProfileIcon } from "../controllers/profileIconControllers.js"
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router()
 const upload = multer({ dest: "uploads/" }); // Carpeta temporal

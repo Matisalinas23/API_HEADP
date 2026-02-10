@@ -1,4 +1,4 @@
-import { IUser } from "../../models/user.interface"
+import { IUser } from "../../models/user.interface.js"
 import jwt from "jsonwebtoken"
 
 const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key"

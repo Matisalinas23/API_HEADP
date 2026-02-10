@@ -1,8 +1,6 @@
 import axios from 'axios'
 import { Request, Response } from 'express'
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma.js';
 
 interface AxiosErrorLike {
   response?: {

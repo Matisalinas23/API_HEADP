@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from 'jsonwebtoken';
-import { jwtPayload } from "../models/jwt.interface";
+import { jwtPayload } from "../models/jwt.interface.js";
 
 export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {

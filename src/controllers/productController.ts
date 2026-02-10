@@ -1,10 +1,8 @@
 import { Response, Request } from "express";
-import { PrismaClient } from "@prisma/client";
-import { IProduct } from "../models/product.interface";
-import { ICategory } from "../models/category.interface";
-import cloudinary from "../cloudinary";
-
-const prisma = new PrismaClient()
+import cloudinary from "../cloudinary.js";
+import { IProduct } from "../models/product.interface.js";
+import { prisma } from "../lib/prisma.js";
+import { ICategory } from "../models/category.interface.js";
 
 export const createProduct = async(req: Request, res: Response): Promise<void> => {
     const { name, description} = req.body;

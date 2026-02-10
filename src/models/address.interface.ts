@@ -1,5 +1,5 @@
-import { IPurchaseOrder } from "./purchaseOrder.interface";
-import { IUser } from "./user.interface";
+import { IPurchaseOrder } from "./purchaseOrder.interface.js";
+import { IUser } from "./user.interface.js";
 
 export interface IAddress {
     id: number;

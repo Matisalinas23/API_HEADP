@@ -1,6 +1,6 @@
 import express from 'express'
-import { createCartItem, deleteCartItem, getCartItemsByUser } from '../controllers/cartItemController'
-import { authMiddleware } from '../middlewares/authMiddleware'
+import { authMiddleware } from '../middlewares/authMiddleware.js'
+import { createCartItem, deleteCartItem, getCartItemsByUser } from '../controllers/cartItemController.js'
 
 const router = express.Router()
 

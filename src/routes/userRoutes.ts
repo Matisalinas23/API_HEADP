@@ -1,6 +1,6 @@
 import express from 'express';
-import { addProfileIcon, deleteUser, getAllUsers, getUserByEmail, getUserById, updateUser, updateuserAddress } from '../controllers/userControllers';
-import { authMiddleware } from '../middlewares/authMiddleware';
+import { addProfileIcon, deleteUser, getAllUsers, getUserByEmail, getUserById, updateUser, updateuserAddress } from '../controllers/userControllers.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

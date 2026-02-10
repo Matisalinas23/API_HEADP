@@ -1,13 +1,10 @@
 import dotenv from 'dotenv'
 import express from 'express'
-import {
-  authRoutes, addressRoutes, userRoutes, profileIconRoutes, categoryRoutes,
-  productRoutes, imageRoutes, cartItemRoutes, mpCheckoutRoutes, salesRoutes
-} from "./routes";
+
 import cors from "cors"
-import { corsOrigin } from './services/allowedOrigins.service'
+import { corsOrigin } from './services/allowedOrigins.service.js'
 import cookieParser from 'cookie-parser';
-import prisma from './prisma';
+import { addressRoutes, authRoutes, cartItemRoutes, categoryRoutes, imageRoutes, mpCheckoutRoutes, productRoutes, profileIconRoutes, salesRoutes, userRoutes } from './routes/index.js';
 
 dotenv.config()
 

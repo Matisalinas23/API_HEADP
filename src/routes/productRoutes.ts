@@ -1,8 +1,8 @@
 import express from "express"
-import { createProduct, deleteProduct, getProductByCategories, getProduct, getProducts, updatedCategoriesProduct, updateProduct, updateProductImage, getProductByPriceRange } from "../controllers/productController"
+import { createProduct, deleteProduct, getProductByCategories, getProduct, getProducts, updatedCategoriesProduct, updateProduct, updateProductImage, getProductByPriceRange } from "../controllers/productController.js"
 import multer from "multer";
-import { verifyAdmin } from "../middlewares/verifyAdmin";
-import { authMiddleware } from "../middlewares/authMiddleware";
+import { verifyAdmin } from "../middlewares/verifyAdmin.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router()
 const upload = multer()

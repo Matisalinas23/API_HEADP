@@ -1,6 +1,6 @@
-import { IAddress } from "./address.interface";
-import { IProfileIcon } from "./profileIcon.interface";
-import { IPurchaseOrder } from "./purchaseOrder.interface"; 
+import { IAddress } from "./address.interface.js";
+import { IProfileIcon } from "./profileIcon.interface.js";
+import { IPurchaseOrder } from "./purchaseOrder.interface.js";
 
 type Enum = "ADMIN" | "CLIENT"
 

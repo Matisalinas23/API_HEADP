@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import { comparePassword, hashPassword } from "../services/auth/password.service";
-import { PrismaClient } from "@prisma/client";
-import { generateRefreshToken, generateToken } from "../services/auth/authService";
-import { validateBirthday } from "../services/validateBirthday";
-import jwt from 'jsonwebtoken'
-import { IUser } from "../models/user.interface";
+import jwt from 'jsonwebtoken';
+import { validateBirthday } from "../services/validateBirthday.js";
+import { comparePassword, hashPassword } from "../services/auth/password.service.js";
+import { prisma } from "../lib/prisma.js";
+import { generateRefreshToken, generateToken } from "../services/auth/authService.js";
+import { IUser } from "../models/user.interface.js";
 
-const prisma = new PrismaClient()
 const refreshTokens: string[] = [];
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -15,7 +14,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     try {
         if (!type) {
             if (!email || !password || !name || !lastname || !dni || !birthday || !address){
-                res.status(400).json({ error: "Email, password, name, lastname, dni and birthday are required" });
+                res.status(400).json({ error: "Email, password, name, lastname, address, dni and birthday are required" });
                 return;
             }
         } else {

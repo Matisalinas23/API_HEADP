@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client'; 
-import { IAddress } from '../models/address.interface';
-
-const prisma = new PrismaClient()
+import { IAddress } from '../models/address.interface.js';
+import { prisma } from '../lib/prisma.js';
 
 export const getAllAddress = async (req: Request, res: Response): Promise<void> => {
     try {

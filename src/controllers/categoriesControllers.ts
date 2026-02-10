@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-
-const prisma = new PrismaClient()
+import { prisma } from "../lib/prisma.js";
 
 export const createCategorie = async (req: Request, res: Response): Promise<void> => {
     const { name } = req.body

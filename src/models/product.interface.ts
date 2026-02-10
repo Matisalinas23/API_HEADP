@@ -1,5 +1,5 @@
-import { ICategory } from "./category.interface";
-import { Image } from "./image.interface";
+import { Image } from "@prisma/client"
+import { ICategory } from "./category.interface.js"
 
 export interface IProduct {
     id: number,

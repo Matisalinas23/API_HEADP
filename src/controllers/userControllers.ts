@@ -1,7 +1,6 @@
 import { Request, Response } from "express"
-import { PrismaClient } from "@prisma/client";
-import { IUser } from "../models/user.interface";
-import prisma from "../prisma";
+import { prisma } from "../lib/prisma.js";
+import { IUser } from "../models/user.interface.js";
 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {

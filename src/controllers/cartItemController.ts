@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { CartItem } from "../models/cartItem.interface";
-
-const prisma = new PrismaClient()
+import { prisma } from "../lib/prisma.js";
+import { CartItem } from "@prisma/client";
 
 export const getCartItemsByUser = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params

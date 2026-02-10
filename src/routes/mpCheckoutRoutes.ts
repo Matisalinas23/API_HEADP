@@ -1,7 +1,7 @@
 import express from 'express';
-import { createPreferenceId } from '../controllers/mpCheckoutControllers';
-import { webhook } from '../controllers/mpCheckoutControllers';
-import { authMiddleware } from '../middlewares/authMiddleware';
+import { createPreferenceId } from '../controllers/mpCheckoutControllers.js';
+import { webhook } from '../controllers/mpCheckoutControllers.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router()
 

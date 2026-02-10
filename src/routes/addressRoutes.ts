@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteAddress, getAllAddress } from '../controllers/addressControlles';
+import { deleteAddress, getAllAddress } from '../controllers/addressControlles.js';
 
 const router = express.Router();
 

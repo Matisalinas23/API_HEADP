@@ -1,10 +1,8 @@
-import e, { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-import { IProfileIcon } from "../models/profileIcon.interface";
-import cloudinary from "../cloudinary";
+import { Request, Response } from "express";
 import fs from "fs";
-
-const prisma = new PrismaClient()
+import { IProfileIcon } from "../models/profileIcon.interface.js";
+import cloudinary from "../cloudinary.js";
+import { prisma } from "../lib/prisma.js";
 
 export const createProfileIcon = async (req: Request, res: Response) => {
   try {
